@@ -1,0 +1,78 @@
+package demo;
+
+import java.util.ArrayList;
+import java.util.Random;
+import javax.swing.JFrame;
+abstract  class WaterLevelObserver{
+    class  public void update(int waterLevel);
+}
+class Alarm extends JFrame, WaterLevelObserver{ //Illegal No Multiple inheritance in Java
+
+    @Override
+    public void update(int waterLevel) {
+        System.out.println(waterLevel >= 50 ? "ON" : "OFF");
+    }
+}
+
+class Display extends JFrame,WaterLevelObserver{
+
+    @Override
+    public void update(int waterLevel) {
+        System.out.println("Water Level : " + waterLevel);
+    }
+}
+
+class SMSSender extends JFrame, WaterLevelObserver{
+
+    @Override
+    public void update(int waterLevel) {
+        System.out.println("Sending sms : " + waterLevel);
+    }
+}
+
+class Splitter extends JFrame,WaterLevelObserver{
+
+    @Override
+    public void update(int waterLevel) {
+        System.out.println(waterLevel>=75 ? "Splitter ON":"Splitter OFF");
+    }
+    
+}
+class ControlRoom {
+    private ArrayList <WaterLevelObserver>observerList=new ArrayList<>();
+    private int waterLevel;
+    
+    public void addWaterLevelObserver(WaterLevelObserver waterLevelObserver){
+        observerList.add(waterLevelObserver);
+    }
+    public void notifyWaterLevelObservers() {
+        for (WaterLevelObserver observer : observerList) {
+            observer.update(waterLevel);
+        }
+    }
+
+    public void setWaterLevel(int waterLevel) {
+        if (this.waterLevel != waterLevel) {
+            this.waterLevel = waterLevel;
+        }
+        notifyWaterLevelObservers();
+    }
+}
+
+public class Demo {
+
+    public static void main(String[] args) {
+        ControlRoom controlRoom = new ControlRoom();
+        controlRoom.addWaterLevelObserver(new Alarm());
+        controlRoom.addWaterLevelObserver(new Display());
+        controlRoom.addWaterLevelObserver(new SMSSender());
+        controlRoom.addWaterLevelObserver(new Splitter());
+        Random r = new Random();
+        while (true) {
+            int waterLevel=r.nextInt(101);//0 to 100
+            controlRoom.setWaterLevel(waterLevel);
+            try{Thread.sleep(1000);}catch(Exception ex){}
+        }
+
+    }
+}
